@@ -45,5 +45,6 @@ void LCD::clear(){
 }
 
 void LCD::message(String message){
+  //Serial.println(message);
   lcd.print(message);
  }

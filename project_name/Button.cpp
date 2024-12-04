@@ -11,6 +11,7 @@
 Button::Button(){
   pinMode(BUTTON_PIN, INPUT);
   Serial.begin(115200);
+  Serial.println("test");
 }
 
 Button::~Button(){;}
@@ -18,11 +19,11 @@ Button::~Button(){;}
 bool Button::isPress(){
   int buttonState = digitalRead(BUTTON_PIN);
     if(buttonState == LOW){
-      Serial.println("Button not pressed");
+      //Serial.println("Button not pressed");
       return false;
     }
     else{
-      Serial.println("Button pressed");
+      //Serial.println("Button pressed");
       return true;
     }
 }
