@@ -8,9 +8,15 @@
 #include <unistd.h>
 #include <termios.h>
 #include <fcntl.h>
+#include <pthread.h>
 
 #define DESIRED_WIDTH  70
 #define DESIRED_HEIGHT 25
+
+int fd;
+bool start = false;
+int direction = 0;
+pthread_mutex_t direction_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 WINDOW * g_mainwin;
 int g_oldcur, g_score = 0, g_width, g_height;
@@ -184,30 +190,65 @@ bool snake_move_player( pos head )
 
 }
 
+void* serial_listener(void* arg) {
+    //printf("Serial listener thread started\n");
+    char input[100];
+    
+    while (1) {
+        int n = read(fd, input, sizeof(input) - 1);
+        if (n == -1) {
+            perror("Error reading from serial port");
+        }
+        if (n > 0) {
+            input[n] = '\0';
+            //printf("Received input: '%s'\n", input);
+            if (strncmp(input, "start_game", 10) == 0) {
+                start = true;
+            } else if (strncmp(input, "up", 2) == 0) {
+                pthread_mutex_lock(&direction_mutex);
+                direction = 1;  // UP
+                pthread_mutex_unlock(&direction_mutex);
+            } else if (strncmp(input, "right", 5) == 0) {
+                pthread_mutex_lock(&direction_mutex);
+                direction = 2;  // RIGHT
+                pthread_mutex_unlock(&direction_mutex);
+            } else if (strncmp(input, "down", 4) == 0) {
+                pthread_mutex_lock(&direction_mutex);
+                direction = 3;  // DOWN
+                pthread_mutex_unlock(&direction_mutex);
+            } else if (strncmp(input, "left", 4) == 0) {
+                pthread_mutex_lock(&direction_mutex);
+                direction = 4;  // LEFT
+                pthread_mutex_unlock(&direction_mutex);
+            }
+        }
+        sleep(1);
+    }
+    return NULL;
+}
+
 void snake_run()
 {
-    char input[20];
-
-    int fd = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NDELAY);
+    fd = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NDELAY);
     if (fd == -1) {
         perror("Error opening serial port");
+        exit(1);
+    } else {
+        //printf("Serial port opened successfully, fd = %d\n", fd);
     }
 
     struct termios tty;
     tcgetattr(fd, &tty);
 
-    int cr1 = cfsetispeed(&tty, B115200);
-    int cr2 = cfsetospeed(&tty, B115200);
+    cfsetispeed(&tty, B115200);
+    cfsetospeed(&tty, B115200);
 
-    printf("heueueui");
-
-    printf("cr1 = %d", cr1);
-    printf("cr2 = %d", cr2);
+    int flags = fcntl(fd, F_GETFL, 0);
+    fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 
     tcsetattr(fd, TCSANOW, &tty);
     tcflush(fd, TCIOFLUSH);
 
-    int key = KEY_RIGHT;
     if( ( g_mainwin = initscr() ) == NULL ) {
         perror( "error initialising ncurses" );
         exit( EXIT_FAILURE );
@@ -241,56 +282,52 @@ void snake_run()
     pos head = { 5,5 };
     enqueue( head );
     
+    speed_t input_speed = cfgetispeed(&tty);
+    speed_t output_speed = cfgetospeed(&tty);
+
+    printf("Input Baud Rate: %d\n", (int)input_speed);
+    printf("Output Baud Rate: %d\n", (int)output_speed);
+    printf("Waiting for 'start_game' command to start...\n");
+
+    pthread_t serial_thread;
+    pthread_create(&serial_thread, NULL, serial_listener, NULL);
+
+    while(!start){
+        //mvwaddstr(g_mainwin, g_height / 2, g_width / 2 - 7, "Waiting for start...");
+        wrefresh(g_mainwin);
+        sleep(1);
+        //printf("start : %d\n", start);
+    }
+
     // Event loop
     while( 1 )
     {
-        printf("Waiting for 'start_game' command to start...\n");
-        if(scanf("%s", input) > 0){
-            printf("Received input: %s\n", input);
-            if(strcmp(input, "start_game") == 0){
-                printf("Game started \n");
-            }
-        }
-        sleep(1);
-        int in = getch( );
-        if( in != ERR )
-            key = in;
-        switch( key )
+        //printf("Game started\n");
+        pthread_mutex_lock(&direction_mutex);  // Protéger l'accès à `direction`
+        int current_direction = direction;
+        pthread_mutex_unlock(&direction_mutex);
+        switch( current_direction )
         {
-            case KEY_DOWN:
-            case 'j':
-            case 'J':
-            case 's':
-            case 'S':
+            case 3: // DOWN
                 head.y++;
                 break;
-            case KEY_RIGHT:
-            case 'l':
-            case 'L':
-            case 'd':
-            case 'D':
+            case 2: // RIGHT
                 head.x++;
                 break;
-            case KEY_UP:
-            case 'k':
-            case 'K':
-            case 'w':
-            case 'W':
+            case 1: // UP
                 head.y--;
                 break;
-            case KEY_LEFT:
-            case 'h':
-            case 'H':
-            case 'a':
-            case 'A':
+            case 4: //LEFT
                 head.x--;
                 break;
-
         }
+        //printf("new position = %d", head.x);
         if( !snake_in_bounds( head ) )    
             snake_game_over( );
         else
             snake_move_player( head );
+            wrefresh(g_mainwin);
+        sleep(1);
     }
     snake_game_over( );
     close(fd);

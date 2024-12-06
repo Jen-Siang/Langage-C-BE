@@ -23,7 +23,7 @@ void rotaryAngleSensor::run(void)
   int sensorValue = analogRead(rotary);
   voltage = (float)sensorValue*ADC_REF/1023;
   float degrees = (voltage*fullAngle)/GROVE_VCC;
-  Serial.println("The angle between the mark and the starting position:");
+  //Serial.println("The angle between the mark and the starting position:");
 
   int brightness;
   brightness = map(degrees, 0, fullAngle, 0, 255);

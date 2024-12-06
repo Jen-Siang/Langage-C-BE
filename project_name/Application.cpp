@@ -79,21 +79,27 @@ void Application::run(void)
     Button startButton;
     Led myLed;
     rotaryAngleSensor rotationSensor;
-
-    // Afficher "Press to Start" sur l'écran LCD
-    myLCD.clear();
-    myLCD.message("Press button");
+    
 
     // Attendre que le bouton soit pressé
     while (!startButton.isPress()) {
-        delay(500); // Attendre que le bouton soit pressé
+      // Afficher "Press to Start" sur l'écran LCD
+      myLCD.clear();
+      myLCD.message("Press button");
+      delay(500); // Attendre que le bouton soit pressé
     }
+
+    // Afficher "Press to Start" sur l'écran LCD
+    myLCD.clear();
+    myLCD.message("Game started");
     Serial.println("start_game");
     delay(500);
 
-//    myLCD.clear();
-//    myLCD.message("Game Over!");
-//    myLed.high();
-//    delay(2000);
-//    myLed.low();
+    while(true){
+      myLCD.clear();
+      myLCD.message("Score :");
+      rotaryAngleSensor myRotaryAngleSensor;
+      myRotaryAngleSensor.run();
+    }
+
 }
