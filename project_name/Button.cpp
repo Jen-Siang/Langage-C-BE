@@ -6,24 +6,21 @@
 #include "Button.h"
 #include <Arduino.h>
 
-#define BUTTON_PIN D8
+//#define BUTTON_PIN D8
 
-Button::Button(){
-  pinMode(BUTTON_PIN, INPUT);
+Button::Button(int pin) : Peripheral("Button"), pin(pin) {};
+
+void Button::Button::init() {
   Serial.begin(115200);
-  Serial.println("test");
+  pinMode(pin, INPUT);
 }
 
-Button::~Button(){;}
-
-bool Button::isPress(){
-  int buttonState = digitalRead(BUTTON_PIN);
-    if(buttonState == LOW){
-      //Serial.println("Button not pressed");
+bool Button::isPress() {
+  int buttonState = digitalRead(pin);
+    if(buttonState == LOW) {
       return false;
     }
     else{
-      //Serial.println("Button pressed");
       return true;
     }
 }

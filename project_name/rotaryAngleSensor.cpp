@@ -1,33 +1,25 @@
 #include "rotaryAngleSensor.h"
 #include <Arduino.h>
-#include <cstddef>
 
-rotaryAngleSensor::rotaryAngleSensor()
-{
-  // Code
+//#define rotary A0
+#define fullAngle 300 //300 degrees
+#define ADC_REF 3.3
+#define GROVE_VCC 3.3
+
+rotaryAngleSensor::rotaryAngleSensor(int pin) : Peripheral("RotaryAngleSensor"), pin(pin) {}
+
+void rotaryAngleSensor::init() {
+  pinMode(pin, INPUT);
   Serial.begin(115200);
-  pinMode(rotary, INPUT);
-  pinMode(LED,OUTPUT);
-  ;
+  Serial.println("Rotary Angle Sensor initialized");
 }
-  
-rotaryAngleSensor::~rotaryAngleSensor()
-{
-  // Code
-  ;
-}  
+ 
 
-void rotaryAngleSensor::run(void)
-{
+void rotaryAngleSensor::run(void) {
   float voltage;
-  int sensorValue = analogRead(rotary);
+  int sensorValue = analogRead(pin);
   voltage = (float)sensorValue*ADC_REF/1023;
   float degrees = (voltage*fullAngle)/GROVE_VCC;
-  //Serial.println("The angle between the mark and the starting position:");
-
-  int brightness;
-  brightness = map(degrees, 0, fullAngle, 0, 255);
-  analogWrite(LED,brightness);
 
   if(degrees >=0 && degrees <75){
     Serial.println("up");

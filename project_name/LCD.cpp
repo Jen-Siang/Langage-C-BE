@@ -7,27 +7,31 @@
 #include "rgb_lcd.h"
 #include <Arduino.h>
 
-LCD::LCD(){
-  Serial.begin(115200);
-  lcd.begin(16, 2); // Écran 16 colonnes, 2 lignes
-  lcd.clear();
-}
+LCD::LCD() : Peripheral("LCD") {};
 
-LCD::~LCD(){;}
-
-void LCD::init(){
+void LCD::init() {
   Serial.begin(115200);
-  // Initialisation de l'écran LCD
-  lcd.begin(16, 2); // Écran 16 colonnes, 2 lignes
-  // Définit la couleur du rétroéclairage
-  lcd.setRGB(colorR, colorG, colorB);
-  // Affiche un message
+  lcd.begin(16, 2); // LCD 16 colonnes, 2 lignes
+  lcd.setRGB(colorR, colorG, colorB); // Couleur par défaut
   lcd.print("Initialisation");
   delay(2000); // Attendre 2 secondes
-  // Efface l'écran
-  lcd.clear();
+  lcd.clear(); // Efface l'écran
 }
-void LCD::progChangeColor(){
+
+void LCD::clear() {
+  lcd.clear();
+  lcd.setCursor(0, 0); // Colonne 0, ligne 0
+}
+
+void LCD::message(const String message) {
+  lcd.print(message);
+}
+
+void LCD::setCursor(int col, int row){
+  lcd.setCursor(col, row);
+}
+
+void LCD::progChangeColor() {
   for (int i = 0; i <= 255; i++) {
      lcd.setRGB(i, 255 - i, i / 2);
      delay(10);
@@ -37,18 +41,4 @@ void LCD::progChangeColor(){
      lcd.setRGB(i, 255 - i, i / 2);
      delay(10);
   }
-}
-
-void LCD::clear(){
-  lcd.clear();
-  lcd.setCursor(0, 0); // Colonne 0, ligne 0
-}
-
-void LCD::message(String message){
-  //Serial.println(message);
-  lcd.print(message);
-}
-
-void LCD::setCursor(int col, int lig){
-  lcd.setCursor(col, lig);
 }

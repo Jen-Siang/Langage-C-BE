@@ -1,41 +1,35 @@
-/*********************************************************************
- * @file  LCD.h
- * @author <mettre l'adresse mail ou nom prenom>
- * @brief Fichier header de l'application
- *********************************************************************/
 #ifndef LCD_H_
 #define LCD_H_
 
+#include "Peripheral.h"
 #include "rgb_lcd.h"
 
 /**
-  * @class LCD
-  * @brief Classe LCD
-*/    
-class LCD
-{
-  private :
+ * @class LCD
+ * @brief Classe représentant un écran LCD
+ */
+class LCD : public Peripheral {
+private:
     rgb_lcd lcd;
-    // Constantes pour les couleurs RGB
-    const int colorR = 255; // Rouge
-    const int colorG = 0;   // Vert
-    const int colorB = 0;   // Bleu
 
-  public :
-    /**
-     * @fn LCD();
-     * @brief Constructeur par defaut
-    */    
+    // Constantes pour les couleurs RGB
+    const int colorR = 255;
+    const int colorG = 0;
+    const int colorB = 0;
+
+public:
     LCD();
-    /**
-     * @fn LCD();
-     * @brief Destructeur
-    */    
-    ~LCD();
-    void init();
-    void progChangeColor();
+    ~LCD() {};
+
+    void init() override;
+
     void clear();
-    void message(String message);
-    void setCursor(int col, int lig);
+
+    void message(const String message);
+
+    void setCursor(int col, int row);
+
+    void progChangeColor();
 };
+
 #endif

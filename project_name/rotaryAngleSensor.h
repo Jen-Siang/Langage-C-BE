@@ -1,12 +1,23 @@
-#define rotary A0
-#define LED D5
-#define fullAngle 300 //300 degrees
-#define ADC_REF 3.3
-#define GROVE_VCC 3.3
+#ifndef ROTARY_ANGLE_SENSOR_H_
+#define ROTARY_ANGLE_SENSOR_H_
 
-class rotaryAngleSensor{
-  public:
-    rotaryAngleSensor();   
-    ~rotaryAngleSensor();  
-    void run(void);
+#include "Peripheral.h"
+
+/**
+ * @class rotaryAngleSensor
+ * @brief Classe représentant un capteur de rotation
+ */
+class rotaryAngleSensor : public Peripheral {
+private:
+    int pin;  // Pin analogique du capteur
+
+public:
+    rotaryAngleSensor(int pin);
+    ~rotaryAngleSensor(){};
+
+    void init() override;
+
+    void run();
 };
+
+#endif

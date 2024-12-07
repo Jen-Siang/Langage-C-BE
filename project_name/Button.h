@@ -1,32 +1,23 @@
-/*********************************************************************
- * @file  Button.h
- * @author <mettre l'adresse mail ou nom prenom>
- * @brief Fichier header de l'application
- *********************************************************************/
 #ifndef BUTTON_H_
 #define BUTTON_H_
 
+#include "Peripheral.h"
+
 /**
-  * @class Button
-  * @brief Classe Button 
-*/    
-class Button
-{
-  public :
-    /**
-     * @fn Button();
-     * @brief Constructeur par defaut
-    */    
-    Button();
-    /**
-     * @fn Button();
-     * @brief Destructeur
-    */    
-    ~Button();    
-    /**
-     * @fn void run(void)
-     * @brief Fonction de lancement du boutton
-    */
-    bool isPress(void);
+ * @class Button
+ * @brief Classe représentant un bouton
+ */
+class Button : public Peripheral {
+private:
+    int pin;  // Pin du bouton
+
+public:
+    Button(int pin);
+    ~Button() {}
+
+    void init() override;
+
+    bool isPress();
 };
+
 #endif
