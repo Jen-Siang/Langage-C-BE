@@ -36,5 +36,6 @@ class LCD
     void progChangeColor();
     void clear();
     void message(String message);
+    void setCursor(int col, int lig);
 };
 #endif

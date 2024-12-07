@@ -10,8 +10,8 @@
 #include <fcntl.h>
 #include <pthread.h>
 
-#define DESIRED_WIDTH  70
-#define DESIRED_HEIGHT 25
+#define DESIRED_WIDTH  35
+#define DESIRED_HEIGHT 15
 
 int fd;
 bool start = false;
@@ -106,6 +106,10 @@ void snake_draw_board( )
 // Resets the terminal window and clears up the mem
 void snake_game_over( )
 {
+    char game_over_message[15];
+    sprintf(game_over_message, "game_over\n");
+    write(fd, game_over_message, strlen(game_over_message));
+    
     free( spaces );
     while( front )
     {
@@ -188,6 +192,10 @@ bool snake_move_player( pos head )
     attrset( COLOR_PAIR( 2 ) );
     snake_write_text( g_height+1, 9, buffer );
 
+    char score_message[50];
+    sprintf(score_message, "score:%d\n", g_score);
+    int bytes_written = write(fd, score_message, strlen(score_message));
+    //printf("Score sent:%s (bytes written:%d)\n", score_message, bytes_written);
 }
 
 void* serial_listener(void* arg) {

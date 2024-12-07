@@ -33,48 +33,6 @@ void Application::init(void)
 
 void Application::run(void)
 {
-//    Button myButton;
-//    Led myLed;
-//    LCD myLCD;
-//
-//    bool buttonPressedLast = false;
-//    bool actionState = false;
-//
-//    while (true){
-//      bool buttonPressedCurrent = myButton.isPress();
-//
-//      if(buttonPressedCurrent && (not buttonPressedLast)){
-//        actionState = !actionState;
-//
-//        if(actionState){
-//          myLed.high();
-//          myLCD.clear();
-//          myLCD.message("Button pressed");
-//    //      lcd.setCursor(0, 1); // Colonne 0, ligne 1
-//    //      lcd.print(":)");
-//          myLCD.progChangeColor();
-//          
-//          while(true){
-//            rotaryAngleSensor myRotaryAngleSensor;
-//            myRotaryAngleSensor.run();
-//            if(myButton.isPress()){
-//              break;
-//            }
-//          }
-//        }
-//        else{
-//          myLed.low();
-//          myLCD.clear();
-//          myLCD.message("not pressed");
-//      //  lcd.setCursor(0, 1); // Colonne 0, ligne 1
-//      //  lcd.print(":(");
-//        }
-//      }
-//
-//      buttonPressedLast = buttonPressedCurrent;
-//      delay(50);
-//    }
-
     LCD myLCD;
     Button startButton;
     Led myLed;
@@ -83,23 +41,37 @@ void Application::run(void)
 
     // Attendre que le bouton soit pressé
     while (!startButton.isPress()) {
-      // Afficher "Press to Start" sur l'écran LCD
       myLCD.clear();
       myLCD.message("Press button");
+      myLCD.setCursor(0, 1);
+      myLCD.message("to start");
       delay(500); // Attendre que le bouton soit pressé
     }
 
-    // Afficher "Press to Start" sur l'écran LCD
-    myLCD.clear();
-    myLCD.message("Game started");
     Serial.println("start_game");
     delay(500);
 
     while(true){
-      myLCD.clear();
-      myLCD.message("Score :");
+      if (Serial.available() > 0) {
+        String message = Serial.readStringUntil('\n');  // Lire jusqu'à la fin de ligne
+        message = message.substring(1); // Enleve le premier caractère
+        if (message.startsWith("score:")) {
+            String score = message.substring(6);  // Extraire la valeur du score
+            delay(500);
+            myLCD.clear();
+            myLCD.message("Game started");
+            myLCD.setCursor(0, 1);  // Ligne 2
+            myLCD.message("Score:");
+            myLCD.setCursor(7, 1);  // Afficher le score à droite
+            myLCD.message(score);
+        }
+        if (message.startsWith("game_over")) {
+          myLCD.clear();
+          myLCD.message("Game Over");
+          delay(500);  
+        }
+      }
       rotaryAngleSensor myRotaryAngleSensor;
       myRotaryAngleSensor.run();
     }
-
 }

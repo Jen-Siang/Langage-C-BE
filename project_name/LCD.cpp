@@ -47,4 +47,8 @@ void LCD::clear(){
 void LCD::message(String message){
   //Serial.println(message);
   lcd.print(message);
- }
+}
+
+void LCD::setCursor(int col, int lig){
+  lcd.setCursor(col, lig);
+}
