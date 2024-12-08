@@ -42,3 +42,8 @@ void LCD::progChangeColor() {
      delay(10);
   }
 }
+
+LCD& LCD::operator<<(const String& message) {
+    this->message(message);
+    return *this;
+}

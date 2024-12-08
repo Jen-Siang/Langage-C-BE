@@ -47,9 +47,9 @@ void Application::run(void)
       // Attendre que le bouton soit pressé
       while (!startButton.isPress()) {
         myLCD.clear();
-        myLCD.message("Press button");
+        myLCD << "Press button";
         myLCD.setCursor(0, 1);
-        myLCD.message("to start");
+        myLCD << "to start";
         delay(500); // Attendre que le bouton soit pressé
       }
   
@@ -72,9 +72,9 @@ void Application::run(void)
               String score = message.substring(6);  // Extraire la valeur du score
               delay(500);
               myLCD.clear();
-              myLCD.message("Game started");
+              myLCD << "Game started";
               myLCD.setCursor(0, 1);  // Ligne 2
-              myLCD.message("Score:");
+              myLCD << "Score:";
               myLCD.setCursor(7, 1);  // Afficher le score à droite
               myLCD.message(score);
           }
@@ -82,7 +82,7 @@ void Application::run(void)
           if (message.startsWith("game_over")) {
             myLed.low();
             myLCD.clear();
-            myLCD.message("Game Over");
+            myLCD << "Game Over";
             while (!startButton.isPress()) {
               delay(500);
             }

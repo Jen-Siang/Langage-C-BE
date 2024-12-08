@@ -30,6 +30,8 @@ public:
     void setCursor(int col, int row);
 
     void progChangeColor();
+
+    LCD& operator<<(const String& message);
 };
 
 #endif
