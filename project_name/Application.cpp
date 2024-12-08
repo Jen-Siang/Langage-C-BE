@@ -9,6 +9,7 @@
 #include "Led.h"
 #include "LCD.h"
 #include "rotaryAngleSensor.h"
+#include "PeripheralException.h"
 #include <vector>
 #include <Arduino.h>
 
@@ -42,7 +43,7 @@ void Application::run(void)
     myLed.init();
     rotationSensor.init();
     
-    //try{
+    try{
       // Attendre que le bouton soit pressé
       while (!startButton.isPress()) {
         myLCD.clear();
@@ -57,10 +58,16 @@ void Application::run(void)
   
       while(true){
         myLed.high();
+        
+        if (Serial.available() < 0) {  // Vérifiez si le port série est indisponible
+          throw PeripheralException("Serial port unavailable");
+        }
+        
         if (Serial.available() > 0) {
           String message = Serial.readStringUntil('\n');  // Lire jusqu'à la fin de ligne
           //message = message.substring(1); // Enleve le premier caractère
           //Serial.println(message);
+          
           if (message.startsWith("score:")) {
               String score = message.substring(6);  // Extraire la valeur du score
               delay(500);
@@ -71,6 +78,7 @@ void Application::run(void)
               myLCD.setCursor(7, 1);  // Afficher le score à droite
               myLCD.message(score);
           }
+          
           if (message.startsWith("game_over")) {
             myLed.low();
             myLCD.clear();
@@ -79,10 +87,12 @@ void Application::run(void)
               delay(500);
             }
             break;  
-          }
-              
+          }   
         }
+        
         rotationSensor.run();
       }
-   // } catch(){}
+    } catch (const PeripheralException& e) {
+        Serial.print("Erreur : ");
+    }
 }

@@ -18,22 +18,6 @@ public:
     virtual ~Peripheral() {}
 
     virtual void init() = 0; // Méthode virtuelle pure pour l'initialisation
-
-    virtual void enable() {
-        isActive = true;
-    }
-
-    virtual void disable() {
-        isActive = false;
-    }
-
-    bool isEnabled() const {
-        return isActive;
-    }
-
-    String getName() const {
-        return name;
-    }
 };
 
 #endif
